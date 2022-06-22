@@ -1,0 +1,24 @@
+* {
+    font-family: Tahoma;
+}
+
+h1, .subject {
+    text-align: center;
+    color: black;
+}
+
+table.product {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+.contains {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.flex {
+    display: flex;
+}

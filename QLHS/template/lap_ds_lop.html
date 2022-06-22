@@ -1,0 +1,38 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Lập danh sách lớp{% endblock %}
+
+{% block content %}
+<br>
+<h1 class="text-center text-info">LẬP DANH SÁCH LỚP</h1>
+
+<div class="alert alert-success"><h4 id="msg"></h4></div>
+
+<form method="post"  enctype="multipart/form-data">
+    <div class="form-group row">
+        <label class="col-md-2 text-secondary" for="gender">Chọn khối: </label>
+        <select name="grade" class="custom-select col-md-2" onchange="loadClasses(this)">
+            {% if list_grade %}
+            {% for grade in list_grade %}
+            <option>[{{ grade.id }}] Khối {{ grade.name }}</option>
+            {% endfor %}
+            {% endif %}
+        </select>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 text-secondary" for="gender">Chọn lớp: </label>
+        <select name="lop" class="custom-select col-md-2" id="lop-hoc">
+        </select>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 text-secondary" for="gender">Chọn học sinh: </label>
+        <select name="student" class="custom-select col-md-6" id="students">
+        </select>
+    </div>
+    <div class="row">
+        <input type="button" value="Lưu" class="btn btn-success" onclick="addStudentToClass()">
+        <a class="btn btn-danger" href="{{ url_for('employee', user_id=current_user.id) }}">Thoát</a>
+    </div>
+</form>
+<br>
+{% endblock %}

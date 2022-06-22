@@ -1,0 +1,46 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<br>
+<h1>BẢNG ĐIỂM TRUNG BÌNH LỚP {{ lop.name }}</h1>
+<br>
+{% if msg %}
+<h6 class="text text-danger" id="msg">{{msg}}</h6>
+{% endif %}
+
+<div class="container">
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ và tên</th>
+          <th>Điểm TB HK1</th>
+          <th>Điểm TB HK2</th>
+          <th>Điểm TB cả năm</th>
+        </tr>
+      </thead>
+      <tbody id="show-mark">
+      {% if list %}
+      {% for i in range(size) %}
+      <tr>
+        <td>{{ list[i].stt }}</td>
+        <td>{{ list[i].name }}</td>
+        <td>{{ list[i].DTB_HK1 }}</td>
+        <td>{{ list[i].DTB_HK2 }}</td>
+        <td>{{ list[i].ca_nam }}</td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+      </tbody>
+    </table>
+
+  </div>
+  <div class="row">
+        <a class="btn btn-danger" href="{{ url_for('teacher', user_id=current_user.id) }}">Thoát</a>
+  </div>
+</div>
+<br>
+{% endblock %}

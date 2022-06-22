@@ -1,0 +1,48 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<br>
+<h2 class="text-center text-danger">TIẾP NHẬN HỌC SINH</h2>
+
+{% if msg %}
+<div class="alert alert-success"><h4>{{ msg }}</h4></div>
+{% endif %}
+
+<form method="post" action="{{ url_for('add_student', user_id=user.id) }}" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="name">Họ và tên: </label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Hãy nhập họ và tên của học sinh..." required>
+    </div>
+    <div class="form-group">
+        <label for="gender">Giới tính: </label>
+        <select name="gender" class="custom-select" >
+            <option selected value="male">Nam</option>
+            <option value="female">Nữ</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="day-of-birth">Ngày sinh: </label>
+        <input type="date" class="form-control" id="day-of-birth" name="day_of_birth" required>
+    </div>
+    <div class="form-group">
+        <label for="address">Địa chỉ: </label>
+        <input type="text" class="form-control" id="address" name="address" placeholder="Nhập địa chỉ..." required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email: </label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Hãy nhập Email của học sinh..." required>
+    </div>
+    <div class="form-group">
+        <label for="phone-number">Số điện thoại: </label>
+        <input type="text" class="form-control" id="phone-number" name="phone_number" placeholder="Hãy nhập số điện thoại của học sinh..." required>
+    </div>
+    <div class="row">
+        <input type="submit" value="Thêm học sinh" class="btn btn-success">
+        <a class="btn btn-danger" href="{{ url_for('employee', user_id=current_user.id) }}">Hủy</a>
+    </div>
+
+</form>
+<br>
+{% endblock %}

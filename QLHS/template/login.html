@@ -1,0 +1,26 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block content %}
+<br>
+<h2 class="text-center text-danger">ĐĂNG NHẬP (NHÂN VIÊN - GIÁO VIÊN)</h2>
+
+{% if msg %}
+<div class = "alert alert-danger">
+    <h4>{{ msg }}</h4>
+</div>
+{% endif %}
+
+<form method="post" action="{{url_for('user_login')}}">
+    <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="Hãy nhập họ và tên của bạn..." required>
+    </div>
+    <div class="form-group">
+        <label for="pass">Mật khẩu</label>
+        <input type="password" class="form-control" id="pass" name="password" placeholder="Hãy nhập mật khẩu của bạn..." required>
+    </div><input type="submit" value="Đăng nhập" class="btn btn-danger">
+</form>
+<br><br>
+{% endblock %}

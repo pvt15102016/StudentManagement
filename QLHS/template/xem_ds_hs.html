@@ -1,0 +1,62 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<br>
+<h2 class="text-center text-info">DANH SÁCH HỌC SINH LỚP {{lop.name}}</h2>
+<br>
+<div class="container mt-3 table-responsive">
+  <span class="text-body">Giáo viên chủ nhiệm: {{teacher.name}}</span>
+  <br>
+  <span class="text-body">Sỉ số lớp: {{number}}</span>
+  <br>
+  <input class="form-control" id="myInput" type="text" placeholder="Tìm kiếm...">
+  <br>
+  <table class="table table-hover table-sm table-bordered table-dark table-striped">
+    <thead>
+      <tr>
+        <th>Họ và tên</th>
+        <th>Ngày sinh</th>
+        <th>Giới tính</th>
+        <th>Địa chỉ</th>
+        <th>Email</th>
+        <th>Số điện thoại</th>
+      </tr>
+    </thead>
+    <tbody id="myTable">
+    {% if list_students %}
+    {% for student in list_students %}
+      <tr>
+        <td>{{student.name}}</td>
+        <td>{{student.day_of_birth.strftime("%d/%m/%Y")}}</td>
+        {% if student.gender == Gender.MALE %}
+        <td>Nam</td>
+        {% else %}
+        <td>Nữ</td>
+        {% endif %}
+        <td>{{ student.address }}</td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.phone_number }}</td>
+      </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+  </table>
+  <div class="row">
+        <a class="btn btn-danger" href="{{ url_for('teacher', user_id=current_user.id) }}">Thoát</a>
+  </div>
+  <br>
+</div>
+
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{% endblock %}

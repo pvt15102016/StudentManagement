@@ -1,0 +1,38 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<h2 class="text-center text-danger">NHẬP ĐIỂM MÔN {{subject.name}}</h2>
+
+{% if msg %}
+<div class="alert alert-success"><h4>{{ msg }}</h4></div>
+{% endif %}
+<br>
+<h4 class="text-center text-info">{{student.name}}</h4>
+<br>
+<form method="post" action="{{ url_for('save', subject_id=subject.id, student_id=student.id, id_hocKy=id_hocKy) }}" enctype="multipart/form-data">
+    <div class="container">
+        <div class="row">
+            <label class="col-md-2" for="diem15p">Điểm 15 phút</label>
+            <input class="col-md-2" type="text" class="form-control" id="diem15Phut" name="diem15Phut">
+        </div>
+        <br>
+        <div class="row">
+            <label class="col-md-2" for="diem1Tiet">Điểm 1 tiết</label>
+            <input class="col-md-2" type="text" class="form-control" id="diem1Tiet" name="diem1Tiet">
+        </div>
+        <br>
+        <div class="row">
+            <label class="col-md-2" for="diemThi">Điểm thi</label>
+            <input class="col-md-2" type="text" class="form-control" id="diemThi" name="diemThi">
+        </div>
+        <br>
+        <div class="row">
+            <input class="col-md-2 btn btn-info" type="submit" value="Lưu">
+            <a class="btn btn-danger col-md-2" href="{{ url_for('load_mark', user_id=current_user.id, subject_id=subject.id, id_hocKy=id_hocKy) }}">Thoát</a>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

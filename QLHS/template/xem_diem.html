@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<br>
+<h1>BẢNG ĐIỂM MÔN {{ subject.name }} LỚP {{ lop.name }}</h1>
+<br>
+{% if msg %}
+<h6 class="text text-danger" id="msg">{{msg}}</h6>
+{% endif %}
+
+<div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+      Chọn học kỳ
+    </button>
+    <div class="dropdown-menu">
+      {% for hk in list_hocKy %}
+      <a class="dropdown-item" name="hk" href="{{ url_for('load_mark', subject_id=subject.id, user_id=current_user.id, id_hocKy=hk.id) }}">Học kỳ {{hk.name}}</a>
+      {% endfor %}
+    </div>
+</div>
+<br>
+<div class="container">
+  <div class="table-responsive">
+    <label class="text-info"></label>
+    <label class="text-info">Học kỳ: <span class="text-danger">{{ hocKy.name }}</span></label>
+    <label class="text-info"> - Năm học: <span class="text-danger">{{ nam.name }}</span></label>
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ và tên</th>
+          <th>Điểm 15 phút</th>
+          <th>Điểm 1 tiết</th>
+          <th>Điểm thi</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="show-mark">
+      {% if list %}
+      {% for item in list %}
+      <tr>
+        <td>{{ item.stt }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.diem15Phut }}</td>
+        <td>{{ item.diem1Tiet }}</td>
+        <td>{{ item.diemThi }}</td>
+        <td>
+          <a href="{{ url_for('nhap_diem', subject_id=subject.id, student_id=item.student_id, id_hocKy=hocKy.id) }}">Chỉnh sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+      </tbody>
+    </table>
+
+  </div>
+  <div class="row">
+        <a class="btn btn-danger" href="{{ url_for('teacher', subject_id=subject.id, user_id=current_user.id) }}">Thoát</a>
+  </div>
+</div>
+<br>
+{% endblock %}
