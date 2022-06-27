@@ -4,11 +4,38 @@
 <h1 class="text-center text-danger">THỐNG KÊ SỐ LƯỢNG ĐẠT-RỚT</h1>
 
 {% if lop %}
-<h4 class="text-center text-info">Lớp: {{lop.name}}</h4>
+<h4 class="text-center text-info">Lớp: {{lop.name}} - Năm học: {{ nam.name }}</h4>
 {% endif %}
 <br>
 <div class="row">
+    <div class="col-md-6 col-xs-12">
+        <form>
+            <div class="form-group">
+                <label for="classes">Chọn lớp: </label>
+                <select name="lop" class="custom-select" >
+                    {% if list_class %}
+                    {% for cl in list_class %}
+                    <option>[Mã lớp: {{cl.id}} ] - {{ cl.name }} (Năm học: {{ nam.name }})</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <input type="submit" value="Thống kê" class="btn btn-info">
 
+        </form>
+        {% if stats1 %}
+        <label class="text-danger">Học kỳ 1: </label>
+        <canvas id="chart1"></canvas>
+        {% endif %}
+        {% if stats2 %}
+        <label class="text-danger">Học kỳ 2: </label>
+        <canvas id="chart2"></canvas>
+        {% endif %}
+        {% if stats %}
+        <label class="text-danger">Cả năm: </label>
+        <canvas id="chart"></canvas>
+        {% endif %}
+    </div>
     <div class="col-md-6 col-xs-12 ">
         <table class="table table-responsive">
             <tr>
@@ -29,36 +56,24 @@
             {% endif %}
         </table>
     </div>
-    <div class="col-md-6 col-xs-12">
-        <form>
-            <div class="form-group">
-                <label for="classes">Chọn lớp: </label>
-                <select name="lop" class="custom-select" >
-                    {% if list_class %}
-                    {% for cl in list_class %}
-                    <option>[ML: {{cl.id}} ] - {{ cl.name }} (MNH: {{ cl.ma_nam_hoc }})</option>
-                    {% endfor %}
-                    {% endif %}
-                </select>
-            </div>
-            <input type="submit" value="Thống kê" class="btn btn-info">
 
-        </form>
-        <canvas id="chart"></canvas>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% if lop %}
 <script>
-  let labels = []
-  info = []
+  let labels = ['Số lượng đạt', 'Số lượng rớt']
+  info = [], info1 = [], info2 = []
   let colors = []
   let borderColors = []
   let r, g, b;
-
+  {% if stats1 %}
+      info1 = [{{stats1.so_luong_dat}}, {{stats1.so_luong_rot}}]
+  {% endif %}
+  {% if stats2 %}
+       info2 = [{{stats2.so_luong_dat}}, {{stats2.so_luong_rot}}]
+  {% endif %}
   {% if stats %}
-      labels = ['Số lượng đạt', 'Số lượng rớt']
       info = [{{stats.so_luong_dat}}, {{stats.so_luong_rot}}]
   {% endif %}
 
@@ -73,6 +88,10 @@
   window.onload = function() {
     const ctx = document.getElementById('chart').getContext('2d');
     loadChart(ctx, labels, info, 'doughnut', colors, borderColors)
+    const ctx1 = document.getElementById('chart1').getContext('2d');
+    loadChart(ctx1, labels, info1, 'bar', colors, borderColors)
+    const ctx2 = document.getElementById('chart2').getContext('2d');
+    loadChart(ctx2, labels, info2, 'bar', colors, borderColors)
   }
 
 function loadChart(ctx, labels, data, type, colors, borderColors) {

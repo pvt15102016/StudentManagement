@@ -73,6 +73,44 @@ function addStudentToClass() {
     })
 }
 
+function deleteStudent(student_id) {
+    if (confirm('Hệ thống sẽ tiến hành xóa tất cả dữ liệu của học sinh này. Bạn có chắc chắn muốn xóa không') == true) {
+        fetch('/api/delete-student/' + student_id, {
+            method: 'delete',
+            body: JSON.stringify({
+                'student_id': student_id
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(data => {
+            alert(data.msg)
+            location.reload()
+        })
+    }
+}
+
+//function luuDiem(student_id, subject_id, id_hocKy) {
+//    fetch('/api/nhap-diem', {
+//        method: 'put',
+//        body: JSON.stringify({
+//            'student_id': parseInt(student_id),
+//            'diem15Phut': document.getElementsClassName('diem15Phut').value,
+//            'diem1Tiet': document.getElementsClassName('d1t').value,
+//            'diemThi': document.getElementsClass('dt').value,
+//            'subject_id': subject_id,
+//            'id_hocKy': id_hocKy
+//        }),
+//        headers: {
+//            'Content-Type': 'application/json'
+//        }
+//    }).then(res => res.json()).then(data => {
+//        alert(data.msg)
+//        location.reload()
+//    })
+//}
+
+
 //function loadMark(subject_id, class_id, id_hocKy) {
 //    fetch('/api/load-mark', {
 //        method: 'post',

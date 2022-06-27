@@ -1,7 +1,7 @@
 import math
 from flask import render_template, request, redirect, url_for, session, jsonify
 from QLHS import app, login, utils
-from QLHS.models import Gender
+from QLHS.models import Gender, UserRole
 from QLHS.admin import *
 from flask_login import login_user, logout_user, login_required
 import hashlib
@@ -68,6 +68,7 @@ def user_load(user_id):
 def change_password(user_id):
     msg = ''
     user = utils.get_user_by_id(user_id)
+    loi = 0
     if request.method.__eq__('POST'):
         pw = str(request.form.get('pw'))
         password = str(hashlib.md5(pw.strip().encode('utf-8')).hexdigest())
@@ -79,10 +80,12 @@ def change_password(user_id):
                 msg = 'Đổi mật khẩu thành công!!!'
             else:
                 msg = 'Mật khẩu nhập lại chưa chính xác'
+                loi = 1
         else:
             msg = 'Mật khẩu không chính xác :))!!!'
+            loi = 1
 
-    return render_template('change_password.html', msg=msg, user=user)
+    return render_template('change_password.html', msg=msg, user=user, role=UserRole, loi=loi)
 
 
 @app.route('/admin-login', methods=['post', 'get'])
@@ -103,6 +106,7 @@ def admin_login():
 @app.route('/employee/<int:user_id>/add-student', methods=['post', 'get'])
 def add_student(user_id):
     msg = ''
+    loi = 0
     user = utils.get_user_by_id(user_id=user_id)
     if request.method.__eq__('POST'):
         name = request.form.get('name')
@@ -129,10 +133,12 @@ def add_student(user_id):
                 msg = 'Tiếp nhận học sinh thành công'
             else:
                 msg = 'Độ tuổi không hợp lệ!!!'
-        except:
-            msg = 'Hệ thống có lỗi!!!'
+                loi = 1
+        except Exception as ex:
+            msg = 'Hệ thống có lỗi!!!' + str(ex)
+            loi = 1
 
-    return render_template('add_student.html', msg=msg, user=user)
+    return render_template('add_student.html', msg=msg, user=user, loi=loi)
 
 @app.route('/lap-danh-sach-lop', methods=['get', 'post'])
 def lap_danh_sach():
@@ -167,8 +173,9 @@ def add_student_to_class():
     class_id = data.get('class_id')
     msg = ''
     list_student_in_class = utils.get_list_student_by_class_id(class_id=class_id)
+    lop = utils.get_class_by_id(class_id)
     if class_id:
-        if list_student_in_class.__len__() <= 40:
+        if list_student_in_class.__len__() <= lop.quantity:
             if utils.check_student(id=student_id, class_id=class_id) is False:
                 try:
                     utils.add_student_to_class(id=student_id, class_id=class_id)
@@ -251,19 +258,23 @@ def nhap_diem(subject_id, student_id, id_hocKy):
                            id_hocKy=id_hocKy,
                            student=student)
 
-@app.route('/save//<int:student_id><int:subject_id>/<int:id_hocKy>', methods=['post', 'get'])
+@app.route('/save/<int:student_id>/<int:subject_id>/<int:id_hocKy>', methods=['post', 'get'])
 def save(subject_id, student_id, id_hocKy):
     msg = ''
+    loi = 0
     if request.method.__eq__('POST'):
-        diem15Phut = request.form.get('diem15Phut')
-        diem1Tiet = request.form.get('diem1Tiet')
-        diemThi = request.form.get('diemThi')
-        if (diem15Phut and (float(diem15Phut) < 0 or float(diem15Phut) > 10)) or \
-                (diem1Tiet and (float(diem1Tiet) < 0 or float(diem1Tiet) > 10)) or \
-                (diemThi and (float(diemThi) < 0 or float(diemThi) > 10)):
-            msg = 'Điểm không hợp lệ!!!'
-        else:
-            try:
+
+        try:
+            diem15Phut = request.form.get('diem15Phut')
+            diem1Tiet = request.form.get('diem1Tiet')
+            diemThi = request.form.get('diemThi')
+
+            if (diem15Phut and (float(diem15Phut) < 0 or float(diem15Phut) > 10)) or \
+                    (diem1Tiet and (float(diem1Tiet) < 0 or float(diem1Tiet) > 10)) or \
+                    (diemThi and (float(diemThi) < 0 or float(diemThi) > 10)):
+                msg = 'Điểm không hợp lệ!!!'
+                loi = 1
+            else:
                 utils.update_mark(subject_id=subject_id,
                                   student_id=student_id,
                                   diem15Phut=diem15Phut,
@@ -271,8 +282,10 @@ def save(subject_id, student_id, id_hocKy):
                                   diemThi=diemThi,
                                   id_hocKy=id_hocKy)
                 msg = 'Lưu thành công!!!'
-            except:
+                return redirect(url_for('load_mark', subject_id=subject_id, user_id=current_user.id, id_hocKy=id_hocKy))
+        except:
                 msg = 'Hệ thống có lỗi!!!'
+                loi = 1
 
     return render_template('nhap_diem.html',
                            msg=msg,
@@ -288,6 +301,50 @@ def load_diem_trung_binh(class_id):
 
     return render_template('xem_diem_trung_binh.html', list=list_diem_lop, lop=lop, size=list_diem_lop.__len__())
 
+@app.route('/edit-info-student/<int:student_id>', methods=['post', 'get'])
+def edit_info_student(student_id):
+    msg = ''
+    if request.method.__eq__('POST'):
+        name = request.form.get('name')
+        sex = request.form.get('gender')
+        address = request.form.get('address')
+        phone_number = request.form.get('phone_number')
+        email = request.form.get('email')
+        day_of_birth = request.form.get('day_of_birth')
+        gender = None
+
+        if sex.__eq__('male'):
+            gender = Gender.MALE
+        else:
+            gender = Gender.FEMALE
+        if utils.check_age(day_of_birth=day_of_birth):
+            try:
+                utils.edit_info_student(student_id=student_id,
+                                        name=name,
+                                        day_of_birth=day_of_birth,
+                                        gender=gender,
+                                        phone_number=phone_number,
+                                        address=address,
+                                        email=email)
+                return redirect(url_for('load_list_student', user_id=current_user.id))
+            except Exception as ex:
+                msg = 'Lỗi hệ thống: ' + str(ex)
+        else:
+            msg = 'Độ tuổi không hợp lệ'
+    return render_template('edit_info_student.html', student=utils.get_student_by_id(id=student_id), gender=Gender, msg=msg)
+
+@app.route('/api/delete-student/<int:student_id>', methods=['delete'])
+def delete_student(student_id):
+    student_id = int(request.json.get('student_id'))
+    try:
+        utils.delete_student(student_id=student_id)
+        msg = 'Xóa thành công!!!'
+    except:
+        msg = 'Không thể xóa!!!'
+
+    return {
+        'msg': msg
+    }
 
 if (__name__ == '__main__'):
     from QLHS.admin import *

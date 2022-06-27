@@ -53,11 +53,12 @@ def get_list_employees():
 
 
 def check_age(day_of_birth):
-    year = datetime.strptime(day_of_birth, "%Y-%m-%d").year
-    today = date.today()
-    age = today.year - year
-    if age.__ge__(15) and age.__le__(20):
-        return True
+    if day_of_birth:
+        year = datetime.strptime(day_of_birth, "%Y-%m-%d").year
+        today = date.today()
+        age = today.year - year
+        if age.__ge__(15) and age.__le__(20):
+            return True
 
 
 def add_student(name, gender, day_of_birth, email, phone_number, address, class_id=None):
@@ -127,6 +128,16 @@ def check_student(id, class_id):
     return False
 
 
+def delete_student(student_id):
+    student = get_student_by_id(id=student_id)
+    hoc = Hoc.query.filter(Hoc.student_id == student_id).all()
+    for h in hoc:
+        db.session.delete(h)
+    db.session.commit()
+    db.session.delete(student)
+    db.session.commit()
+
+
 def get_class_by_id(id):
     return Lop_hoc.query.get(id)
 
@@ -168,12 +179,37 @@ def get_list_student_by_class_id(class_id):
     return Student.query.filter(Student.class_id == class_id).all()
 
 
+def edit_info_student(student_id, name=None, day_of_birth=None, gender=None, phone_number=None, address=None,
+                      email=None):
+    student = get_student_by_id(id=student_id)
+    if name:
+        student.name = name
+    if day_of_birth:
+        student.day_of_birth = day_of_birth
+    if gender:
+        student.gender = gender
+    if phone_number:
+        student.phone_number = phone_number
+    if email:
+        student.email = email
+    if address:
+        student.address = address
+
+    db.session.add(student)
+    db.session.commit()
+
+
 def get_Nam(id):
     return Nam_hoc.query.get(id)
 
 
 def get_HocKy():
     return Hoc_ky.query.all()
+
+
+def get_grade_by_class_id(class_id):
+    lop = get_class_by_id(id=class_id)
+    return Grade.query.get(lop.grade_id)
 
 
 def get_list_student_by_teacher_id(teacher_id):
@@ -187,7 +223,7 @@ def get_mark_subject_of_student(student_id, subject_id, id_hocKy):
 
 
 def get_list_mark_by_subject_id_in_class(subject_id, class_id, id_hoc_ky):  # 1 môn
-    list_student = get_list_student_by_class_id(class_id)
+    list_student = Student.query.filter(Student.class_id == class_id).all()
 
     dict = []
     i = 1
@@ -264,23 +300,44 @@ def diem_TB_HK(student_id, id_hocKy):  # tất cả các môn
 
     return count / subjects.__len__()
 
+def stats_hk(class_id, id_hocKy):#thống kê
+    list_diemTB_hk1 = db.session.query((Hoc.diem15Phut + Hoc.diem1Tiet * 2 + Hoc.diemThi * 3) / 6, Hoc.subject_id,Hoc.student_id, Hoc.id_hocKy, Student.name) \
+                                .join(Student, Student.id == Hoc.student_id) \
+                                .filter(Hoc.id_hocKy == id_hocKy) \
+                                .group_by(Hoc.subject_id, Hoc.student_id).all()
+
+    dau = 0
+    rot = 0
+    for item in list_diemTB_hk1:
+        if item[0] >= 5:
+            dau = dau + 1
+        else:
+            rot = rot + 1
+
+    return {
+        'dau': dau,
+        'rot': rot
+    }
 
 def diem_trung_binh_lop(class_id):
+    # Hoc.diem15Phut, Hoc.diem1Tiet, Hoc.diemThi
+
+
     list_student = get_list_student_by_class_id(class_id=class_id)
 
     dict = []
     i = 1
 
     for st in list_student:
+        TB_hk1 = diem_TB_HK(student_id=st.id, id_hocKy=1)
+        TB_hk2 = diem_TB_HK(student_id=st.id, id_hocKy=2)
         dict.append({
             'stt': i,
             'name': st.name,
-            'DTB_HK1': "{:.1f}".format(diem_TB_HK(student_id=st.id, id_hocKy=1)),
-            'DTB_HK2': "{:.1f}".format(diem_TB_HK(student_id=st.id, id_hocKy=2)),
-            'ca_nam': "{:.1f}".format(
-                (diem_TB_HK(student_id=st.id, id_hocKy=1) + diem_TB_HK(student_id=st.id, id_hocKy=2) * 2) / 3),
-            'xep_loai': xap_loai(float("{:.1f}".format(
-                (diem_TB_HK(student_id=st.id, id_hocKy=1) + diem_TB_HK(student_id=st.id, id_hocKy=2) * 2) / 3)))
+            'DTB_HK1': "{:.1f}".format(TB_hk1),
+            'DTB_HK2': "{:.1f}".format(TB_hk2),
+            'ca_nam': "{:.1f}".format((TB_hk1 + TB_hk2) / 2),
+            'xep_loai': xap_loai(float("{:.1f}".format((TB_hk1 + TB_hk2) / 2)))
         })
         i = i + 1
     return dict
@@ -321,5 +378,3 @@ def thong_ke_theo_nam(class_id):
         'so_luong_dat': so_luong_dat,
         'so_luong_rot': so_luong_rot
     }
-
-

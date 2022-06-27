@@ -5,8 +5,10 @@
 {% block content %}
 <h2 class="text-center text-danger">NHẬP ĐIỂM MÔN {{subject.name}}</h2>
 
-{% if msg %}
+{% if msg and loi == 0 %}
 <div class="alert alert-success"><h4>{{ msg }}</h4></div>
+{% elif msg and loi == 1 %}
+<div class="alert alert-danger"><h4>{{ msg }}</h4></div>
 {% endif %}
 <br>
 <h4 class="text-center text-info">{{student.name}}</h4>

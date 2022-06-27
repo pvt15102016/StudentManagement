@@ -4,34 +4,34 @@
 
 {% block content %}
 <br>
-<h1>GIÁO VIÊN</h1>
+<h1 class="text-center text-info">GIÁO VIÊN</h1>
+<h4 class="text-center">Họ và tên: <span class="text-danger">{{ teacher.name }}</span></h4>
 
-<nav class="navbar">
+<nav class="navbar navbar-expand-sm  navbar-success">
+  <!-- Brand -->
 
   <!-- Links -->
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="btn btn-primary" href="{{ url_for('load_list_student', user_id=current_user.id) }}">Xem danh sách học sinh</a>
+      <a class="nav-link" href="{{ url_for('load_list_student', user_id=current_user.id) }}">Xem danh sách học sinh</a>
     </li>
-    <br>
-    <li class="nav-item">
-      <div class="dropdown">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-          Xem điểm
-        </button>
-        <div class="dropdown-menu">
+
+    <!-- Dropdown -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+        Xem điểm
+      </a>
+      <div class="dropdown-menu">
           {% for s in subjects %}
           <a class="dropdown-item" href="{{  url_for('load_mark', subject_id=s.id, user_id = current_user.id, id_hocKy=1) }}">Môn {{s.name}}</a>
           {% endfor %}
         </div>
-      </div>
     </li>
-    <br>
     <li class="nav-item">
-      <a class="btn btn-primary" href="{{ url_for('load_diem_trung_binh', class_id=teacher.class_id) }}">Xem điểm trung bình cả lớp</a>
+      <a class="nav-link" href="{{ url_for('load_diem_trung_binh', class_id=teacher.class_id) }}">Xem điểm trung bình cả lớp</a>
     </li>
-  </ul>
 
+  </ul>
 </nav>
 
 {% endblock %}

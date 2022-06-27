@@ -109,20 +109,31 @@ class StatsView(AuthenticatedBaseView):
         stats = None
         diem_TB_lop = None
         lop_hoc = None
+        nam = None
+        teacher = None
+        stats_hk1 = None
+        stats_hk2 = None
         if lop:
-            class_id = int(lop.split()[1])
+            class_id = int(lop.split()[2])
             diem_TB_lop = utils.diem_trung_binh_lop(class_id=class_id)
             stats = utils.thong_ke_theo_nam(class_id=class_id)
             lop_hoc = utils.get_class_by_id(id=class_id)
+            nam = utils.get_Nam(lop_hoc.ma_nam_hoc)
+            stats_hk1 = utils.stats_hk(class_id=class_id, id_hocKy=1)
+            stats_hk2 = utils.stats_hk(class_id=class_id, id_hocKy=2)
+
 
         return self.render('admin/stats.html',
                            list_class=list_class,
                            stats=stats,
                            diem_TB_lop=diem_TB_lop,
-                           lop=lop_hoc)
+                           lop=lop_hoc,
+                           nam=nam,
+                           stats1=stats_hk1,
+                           stats2=stats_hk2)
 
 admin = Admin(app=app,
-              name="E-commerce Adminstration",
+              name="Quản trị viên - QUẢN LÝ HỌC SINH",
               template_mode='bootstrap4')
 
 admin.add_view(AuthenticatedModelView(User, db.session, name='Người dùng'))
